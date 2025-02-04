@@ -374,7 +374,7 @@
             Infektiosität
             <button class="info-button" data-info="Wahrscheinlichkeit, dass ein Infizierter pro Tag andere ansteckt. Höhere Werte können zu einer schnelleren und umfangreicheren Virusverbreitung führen.">ℹ</button>
           </label>
-          <input type="range" id="infectivity" min="-4" max="-2" step="0.1" value="-2.3">
+          <input type="range" id="infectivity" min="-4" max="-1" step="0.05" value="-2.3">
           <span id="infectivityValue" class="slider-value">0.005</span>
         </div>
         <!-- Schweregrad -->
@@ -401,7 +401,7 @@
             Halbwertszeit der Immunität
             <button class="info-button" data-info="Anzahl Tage, nach denen die Immunität auf die Hälfte sinkt. Eine kürzere Halbwertszeit kann zu häufigeren Reinfektionen führen.">ℹ</button>
           </label>
-          <input type="range" id="immunityHalfTime" min="-1" max="3" step="0.1" value="0">
+          <input type="range" id="immunityHalfTime" min="0" max="4" step="0.1" value="2">
           <span id="immunityHalfTimeValue" class="slider-value">1</span>
         </div>
         <!-- Anteil bereits Infizierter -->
@@ -438,7 +438,7 @@
             Kapazität Gesundheitssystem
             <button class="info-button" data-info="Maximale Anzahl an Krankenhausbetten. Eine höhere Kapazität kann dazu beitragen, kritische Fälle effektiver zu behandeln und das Gesundheitssystem zu entlasten.">ℹ</button>
           </label>
-          <input type="range" id="healthcareSize" min="0" max="14" step="1" value="7">
+          <input type="range" id="healthcareSize" min="-1" max="15" step=".1" value="7">
           <span id="healthcareSizeValue" class="slider-value">128</span>
         </div>
         <!-- Dynamikfaktor (Alpha) -->
@@ -447,7 +447,7 @@
             Dynamikfaktor (Alpha)
             <button class="info-button" data-info="Beeinflusst die Ansteckungsrate bei Strategie 2. Ein höherer Alpha-Wert führt zu einer stärkeren Reduktion der Infektionsrate bei zunehmender Infektion, was zu einer dynamischeren Anpassung führt.">ℹ</button>
           </label>
-          <input type="range" id="alpha" min="0.1" max="2" value="0.5" step="0.1">
+          <input type="range" id="alpha" min="0" max="3" value="0.5" step="0.1">
           <span id="alphaValue" class="slider-value">0.5</span>
         </div>
       </div>
@@ -502,7 +502,7 @@
             Gesamtfitness pro Tag
             <button class="info-button" data-info="Maximale Fitness, die pro Tag verfügbar ist. Eine höhere Gesamtfitness kann zu schnelleren Erholungsprozessen führen.">ℹ</button>
           </label>
-          <input type="range" id="fitnessPerDay" min="0" max="15" step="1" value="10">
+          <input type="range" id="fitnessPerDay" min="0" max="15" step=".1" value="10">
           <span id="fitnessPerDayValue" class="slider-value">1024</span>
         </div>
       </div>
