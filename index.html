@@ -2,47 +2,26 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Pandemie Simulation</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <title>Simulation einer Pandemie</title>
+  <script src="plotly-latest.min.js"></script>
   
   <!-- Mobile-Erkennung (Majority Vote) -->
   <script>
     (function() {
       let mobileCount = 0;
       let desktopCount = 0;
-
       // 1. Orientation Test
-      let isPortrait = false;
-      if (window.screen && window.screen.orientation && window.screen.orientation.type) {
-        isPortrait = window.screen.orientation.type.startsWith("portrait");
-      } else {
-        isPortrait = window.innerHeight > window.innerWidth;
-      }
-      if (isPortrait) {
-        mobileCount++;
-      } else {
-        desktopCount++;
-      }
-
+      let isPortrait = window.screen && window.screen.orientation && window.screen.orientation.type ?
+                       window.screen.orientation.type.startsWith("portrait") :
+                       window.innerHeight > window.innerWidth;
+      isPortrait ? mobileCount++ : desktopCount++;
       // 2. Browser Data Test
-      if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        mobileCount++;
-      } else {
-        desktopCount++;
-      }
-
+      /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? mobileCount++ : desktopCount++;
       // 3. Touch Support / Coarse Pointer Test
-      let hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-      let hasCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-      if (hasTouch || hasCoarsePointer) {
-        mobileCount++;
-      } else {
-        desktopCount++;
-      }
-
+      (('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.matchMedia && window.matchMedia("(pointer: coarse)").matches)) ? mobileCount++ : desktopCount++;
       // Final Decision (Majority Vote)
       const deviceType = mobileCount > desktopCount ? "Mobile" : "Desktop";
-      window.deviceType = deviceType; // global speichern
+      window.deviceType = deviceType;
       console.log("Detected device type:", deviceType);
       if (deviceType === "Mobile") {
         document.documentElement.classList.add("mobile");
@@ -62,14 +41,13 @@
     
     /* Extreme Anpassungen für mobile Geräte */
     html.mobile body {
-      font-size: 40px;  /* Basis-Schrift sehr groß */
+      font-size: 40px;
     }
     html.mobile .slider-container label {
       font-size: 48px;
     }
     html.mobile .info-button {
-      font-size: 48px;  /* Info-Symbol in etwa so groß wie der Parametername */
-      /* Zusätzlich: als rundes Icon gestalten */
+      font-size: 48px;
       border: 2px solid #001f3f;
       border-radius: 50%;
       width: 1.2em;
@@ -96,22 +74,18 @@
     html.mobile .slider-value {
       font-size: 36px;
     }
-    /* Abschnittstitel doppelt so groß */
     html.mobile .category-section h3 {
       font-size: 72px;
     }
-    /* Auf mobilen Geräten: Slider immer in einer Spalte und mit mehr Abstand */
     html.mobile .slider-container {
       width: 100%;
       margin-right: 0;
       margin-bottom: 40px;
     }
-    /* Erhöhte Abstände zwischen Abschnitten */
     html.mobile .category-section {
       padding: 20px 25px;
       margin-bottom: 40px;
     }
-    /* Slider: Spur und Daumen vergrößern */
     html.mobile input[type="range"] {
       height: 10px;
     }
@@ -181,7 +155,6 @@
       border-radius: 5px;
       margin-bottom: 25px;
     }
-    /* Abschnittsheader: kompletter, linksbündiger Klickbereich mit blauer Linie */
     .category-section h3 {
       border-bottom: 1px solid #001f3f;
       padding: 8px 5px;
@@ -195,7 +168,6 @@
       margin-right: 8px;
     }
     
-    /* Collapsible Content mit Animation */
     .collapsible-content {
       display: flex;
       flex-wrap: wrap;
@@ -209,7 +181,6 @@
       opacity: 1;
     }
     
-    /* Standard-Slider-Container */
     .slider-container {
       width: 45%;
       min-width: 270px;
@@ -223,7 +194,6 @@
       color: #001f3f;
     }
     
-    /* Info-Button: Standard (auf Desktop kleiner) */
     .info-button {
       background: none;
       border: none;
@@ -234,7 +204,6 @@
       position: relative;
     }
     
-    /* Tooltip (wird per JS eingeblendet) */
     .tooltip {
       position: absolute;
       background: rgba(0, 0, 0, 0.8);
@@ -249,7 +218,6 @@
       max-width: 90%;
     }
     
-    /* Slider-Styling */
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
@@ -282,7 +250,6 @@
       background: #002a5a;
     }
     
-    /* Button-Styling */
     .custom-button {
       background-color: #001f3f;
       color: #ffffff;
@@ -292,6 +259,7 @@
       cursor: pointer;
       font-size: 16px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
     }
     .custom-button:hover {
       background-color: #002a5a;
@@ -300,8 +268,23 @@
       background-color: #000f2b;
       box-shadow: none;
     }
+    /* Modernes Design für Preset-Buttons */
+    .custom-button.preset-button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      margin-right: 10px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .custom-button.preset-button.active {
+      background-color: #001f3f;
+      color: #fff;
+    }
+    .custom-button.preset-button.inactive {
+      background-color: #aaa;
+      color: #fff;
+    }
     
-    /* Container für Button und Graph */
     #buttons-container {
       margin-top: 20px;
       margin-bottom: 20px;
@@ -313,7 +296,6 @@
       border-radius: 5px;
     }
     
-    /* Werte-Anzeige neben dem Slider */
     .slider-value {
       margin-left: 8px;
       font-weight: bold;
@@ -323,13 +305,29 @@
 </head>
 <body>
 
-  <!-- Tab-Leiste -->
-  <div class="tabs">
-    <div class="tab active">Gleichungsbasiertes Modell</div>
-    <a href="#" class="tab">Agentenbasiertes Modell</a>
-  </div>
-  <div class="tab-description">
-    <p>Ein Gleichungsbasiertes Modell nutzt mathematische Gleichungen, um die Dynamik einer Pandemie zu simulieren.</p>
+  <!-- Überschrift und Einführung -->
+  <h1>Simulation einer Pandemie</h1>
+  <p>
+    <strong>Maturaarbeit & Modell</strong><br>
+    Diese Simulation ist Teil einer Maturaarbeit und basiert auf einem mathematischen Modell, das den Verlauf einer Pandemie darstellt.
+  </p>
+  <p>
+    <strong>Voreinstellungen & Bereiche</strong><br>
+    Wählen Sie ein voreingestelltes Szenario oder öffnen Sie die Kategorien, um individuelle Parameter anzupassen.
+  </p>
+  <p>
+    <strong>Simulation starten</strong><br>
+    Klicken Sie auf "Simulation starten", um den Modellverlauf zu berechnen.
+  </p>
+  
+  
+  <!-- Voreingestellte Pandemien -->
+  <div id="preset-buttons" style="margin-bottom:20px;">
+    <button id="preset-custom" class="custom-button preset-button active" onclick="applyPreset('custom', this)">Eigene Pandemie</button>
+    <button class="custom-button preset-button inactive" onclick="applyPreset('grippe', this)">Grippe</button>
+    <button class="custom-button preset-button inactive" onclick="applyPreset('pest', this)">Pest</button>
+    <button class="custom-button preset-button inactive" onclick="applyPreset('hiv', this)">HIV</button>
+    <button class="custom-button preset-button inactive" onclick="applyPreset('covid', this)">COVID‑19</button>
   </div>
   
   <div id="sliders">
@@ -340,20 +338,18 @@
         <span>Populations-Parameter</span>
       </h3>
       <div class="collapsible-content">
-        <!-- Anzahl der Blobs -->
         <div class="slider-container">
           <label for="blobsNumber">
             Anzahl der Blobs
-            <button class="info-button" data-info="Gesamtanzahl der simulierten Blobs. Eine höhere Anzahl führt zu einer größeren Population, was die Ausbreitung der Pandemie beschleunigen kann.">ℹ</button>
+            <button class="info-button" data-info="Gibt die Gesamtanzahl der simulierten Individuen an. Eine höhere Anzahl führt zu einer größeren Population und kann die Dynamik der Pandemie verstärken.">ℹ</button>
           </label>
           <input type="range" id="blobsNumber" min="3" max="15" step=".1" value="9">
           <span id="blobsNumberValue" class="slider-value">512</span>
         </div>
-        <!-- Simulationsdauer -->
         <div class="slider-container">
           <label for="simulationDays">
             Simulationsdauer in Tagen
-            <button class="info-button" data-info="Gesamtlänge der Simulation. Eine längere Simulationsdauer ermöglicht eine detailliertere Beobachtung des Pandemieverlaufs.">ℹ</button>
+            <button class="info-button" data-info="Legt die Gesamtdauer der Simulation fest. Eine längere Simulationszeit ermöglicht eine detailliertere Analyse des Pandemieverlaufs.">ℹ</button>
           </label>
           <input type="range" id="simulationDays" min="1.7" max="7" step="0.05" value="3">
           <span id="simulationDaysValue" class="slider-value">64</span>
@@ -368,47 +364,42 @@
         <span>Infektionsdynamik</span>
       </h3>
       <div class="collapsible-content">
-        <!-- Infektiosität -->
         <div class="slider-container">
           <label for="infectivity">
             Infektiosität
-            <button class="info-button" data-info="Wahrscheinlichkeit, dass ein Infizierter pro Tag andere ansteckt. Höhere Werte können zu einer schnelleren und umfangreicheren Virusverbreitung führen.">ℹ</button>
+            <button class="info-button" data-info="Definiert die Tageswahrscheinlichkeit, mit der ein infiziertes Individuum einen weiteren Kontakt infiziert. Höhere Werte bewirken eine raschere Virusausbreitung.">ℹ</button>
           </label>
           <input type="range" id="infectivity" min="-4" max="-1" step="0.05" value="-2.3">
           <span id="infectivityValue" class="slider-value">0.005</span>
         </div>
-        <!-- Schweregrad -->
         <div class="slider-container">
           <label for="severity">
             Schweregrad
-            <button class="info-button" data-info="Wahrscheinlichkeit, dass ein Infizierter ernsthaft erkrankt. Ein höherer Schweregrad kann zu mehr schweren Krankheitsverläufen führen.">ℹ</button>
+            <button class="info-button" data-info="Gibt an, mit welcher Wahrscheinlichkeit ein Infizierter schwer erkrankt. Ein höherer Schweregrad kann zu vermehrten Krankenhausaufnahmen und einem dramatischeren Verlauf führen.">ℹ</button>
           </label>
           <input type="range" id="severity" min="0" max="1" value="0.15" step="0.01">
           <span id="severityValue" class="slider-value">0.15</span>
         </div>
-        <!-- Genesungswahrscheinlichkeit -->
         <div class="slider-container">
           <label for="recoveryChance">
             Genesungswahrscheinlichkeit
-            <button class="info-button" data-info="Wahrscheinlichkeit, dass ein Infizierter pro Tag genest. Höhere Werte können zu einer schnelleren Erholung und Reduktion der Ansteckungsdauer führen.">ℹ</button>
+            <button class="info-button" data-info="Bestimmt die Tageswahrscheinlichkeit, dass ein Infizierter wieder gesund wird. Eine höhere Wahrscheinlichkeit verkürzt die Dauer der Infektion.">ℹ</button>
           </label>
           <input type="range" id="recoveryChance" min="0" max="1" value="0.3" step="0.01">
           <span id="recoveryChanceValue" class="slider-value">0.3</span>
         </div>
-        <!-- Halbwertszeit der Immunität -->
         <div class="slider-container">
           <label for="immunityHalfTime">
             Halbwertszeit der Immunität
-            <button class="info-button" data-info="Anzahl Tage, nach denen die Immunität auf die Hälfte sinkt. Eine kürzere Halbwertszeit kann zu häufigeren Reinfektionen führen.">ℹ</button>
+            <button class="info-button" data-info="Legt fest, nach wie vielen Tagen die Immunität eines Genesenen auf 50 % abnimmt. Eine kürzere Halbwertszeit kann häufigere Reinfektionen begünstigen.">ℹ</button>
           </label>
           <input type="range" id="immunityHalfTime" min="0" max="4" step="0.1" value="2">
           <span id="immunityHalfTimeValue" class="slider-value">1</span>
         </div>
-        <!-- Anteil bereits Infizierter -->
         <div class="slider-container">
           <label for="infectedFromStart">
             Anteil bereits Infizierter
-            <button class="info-button" data-info="Prozentsatz, der von Anfang an infiziert ist. Ein höherer Anteil kann den Start der Pandemie signifikant verstärken.">ℹ</button>
+            <button class="info-button" data-info="Definiert den prozentualen Anteil der Bevölkerung, der zu Beginn der Simulation infiziert ist. Ein höherer Anfangswert kann den Pandemiebeginn erheblich verstärken.">ℹ</button>
           </label>
           <input type="range" id="infectedFromStart" min="0" max="1" value="0.05" step="0.01">
           <span id="infectedFromStartValue" class="slider-value">0.05</span>
@@ -423,29 +414,26 @@
         <span>Strategie-Parameter</span>
       </h3>
       <div class="collapsible-content">
-        <!-- Anteil Strategie 1 -->
         <div class="slider-container">
           <label for="strategy1Size">
             Anteil Strategie 1
-            <button class="info-button" data-info="Prozentualer Anteil der Population, der Strategie 1 folgt. Strategie 1 verwendet ein konstantes β, was zu einem stabileren, aber weniger adaptiven Infektionsverlauf führen kann.">ℹ</button>
+            <button class="info-button" data-info="Gibt den Prozentsatz der Population an, der der Strategie 1 folgt – d. h. trotz Infektionsrisiko weiter aktiv bleibt. Diese Strategie nutzt einen konstanten Infektionsparameter (β) und führt zu einem stabileren, jedoch weniger adaptiven Verlauf.">ℹ</button>
           </label>
           <input type="range" id="strategy1Size" min="0" max="1" value="0.5" step="0.01">
           <span id="strategy1SizeValue" class="slider-value">0.5</span>
         </div>
-        <!-- Kapazität Gesundheitssystem -->
         <div class="slider-container">
           <label for="healthcareSize">
             Kapazität Gesundheitssystem
-            <button class="info-button" data-info="Maximale Anzahl an Krankenhausbetten. Eine höhere Kapazität kann dazu beitragen, kritische Fälle effektiver zu behandeln und das Gesundheitssystem zu entlasten.">ℹ</button>
+            <button class="info-button" data-info="Bestimmt die maximale Anzahl verfügbarer Krankenhausbetten. Eine höhere Kapazität verbessert die Behandlung kritischer Fälle und entlastet das Gesundheitssystem.">ℹ</button>
           </label>
           <input type="range" id="healthcareSize" min="-1" max="15" step=".1" value="7">
           <span id="healthcareSizeValue" class="slider-value">128</span>
         </div>
-        <!-- Dynamikfaktor (Alpha) -->
         <div class="slider-container">
           <label for="alpha">
             Dynamikfaktor (Alpha)
-            <button class="info-button" data-info="Beeinflusst die Ansteckungsrate bei Strategie 2. Ein höherer Alpha-Wert führt zu einer stärkeren Reduktion der Infektionsrate bei zunehmender Infektion, was zu einer dynamischeren Anpassung führt.">ℹ</button>
+            <button class="info-button" data-info="Ein Parameter, der in der Strategie 2 die adaptive Reduktion der Infektionsrate steuert. Höhere Werte bewirken eine stärkere Verringerung der Infektionswahrscheinlichkeit bei steigenden Infektionszahlen.">ℹ</button>
           </label>
           <input type="range" id="alpha" min="0" max="3" value="0.5" step="0.1">
           <span id="alphaValue" class="slider-value">0.5</span>
@@ -460,47 +448,42 @@
         <span>Fitness-Parameter</span>
       </h3>
       <div class="collapsible-content">
-        <!-- Verlust gesund -->
         <div class="slider-container">
           <label for="healthyFitnessLoss">
             Verlust gesund
-            <button class="info-button" data-info="Fitnessverlust für gesunde Blobs. Ein höherer Verlust kann zu einer schnelleren Abnahme der gesunden Population führen und so den Pandemieverlauf beeinflussen.">ℹ</button>
+            <button class="info-button" data-info="Beschreibt den täglichen Fitnessverlust eines gesunden Individuums. Ein zu hoher Verlust kann die Überlebensrate beeinträchtigen.">ℹ</button>
           </label>
           <input type="range" id="healthyFitnessLoss" min="0" max="100" value="1" step="1">
           <span id="healthyFitnessLossValue" class="slider-value">1</span>
         </div>
-        <!-- Verlust infiziert -->
         <div class="slider-container">
           <label for="infectedFitnessLoss">
             Verlust infiziert
-            <button class="info-button" data-info="Fitnessverlust für asymptomatisch Infizierte. Ein höherer Verlust kann die Überlebensfähigkeit der Infizierten reduzieren.">ℹ</button>
+            <button class="info-button" data-info="Gibt den Fitnessverlust eines asymptomatisch infizierten Individuums pro Tag an. Ein erhöhter Verlust kann die Erholungs- und Reproduktionsfähigkeit reduzieren.">ℹ</button>
           </label>
           <input type="range" id="infectedFitnessLoss" min="0" max="100" value="30" step="1">
           <span id="infectedFitnessLossValue" class="slider-value">30</span>
         </div>
-        <!-- Verlust hospitalisiert -->
         <div class="slider-container">
           <label for="hospitalizedFitnessLoss">
             Verlust hospitalisiert
-            <button class="info-button" data-info="Fitnessverlust für hospitalisierte Blobs. Ein höherer Verlust kann die Genesungsdauer verlängern.">ℹ</button>
+            <button class="info-button" data-info="Bestimmt den täglichen Fitnessverlust eines hospitalisierten Individuums. Höhere Werte können zu längeren Genesungszeiten führen.">ℹ</button>
           </label>
           <input type="range" id="hospitalizedFitnessLoss" min="0" max="100" value="20" step="1">
           <span id="hospitalizedFitnessLossValue" class="slider-value">20</span>
         </div>
-        <!-- Verlust ernsthaft erkrankt -->
         <div class="slider-container">
           <label for="symptomsFitnessLoss">
             Verlust ernsthaft erkrankt
-            <button class="info-button" data-info="Fitnessverlust für ernsthaft erkrankte Blobs. Ein höherer Verlust kann die Belastung des Gesundheitssystems erhöhen.">ℹ</button>
+            <button class="info-button" data-info="Legt den Fitnessverlust für schwer erkrankte Individuen fest. Ein erhöhter Wert kann die Krankheitslast und Sterblichkeit erhöhen.">ℹ</button>
           </label>
           <input type="range" id="symptomsFitnessLoss" min="0" max="100" value="60" step="1">
           <span id="symptomsFitnessLossValue" class="slider-value">60</span>
         </div>
-        <!-- Gesamtfitness pro Tag -->
         <div class="slider-container">
           <label for="fitnessPerDay">
             Gesamtfitness pro Tag
-            <button class="info-button" data-info="Maximale Fitness, die pro Tag verfügbar ist. Eine höhere Gesamtfitness kann zu schnelleren Erholungsprozessen führen.">ℹ</button>
+            <button class="info-button" data-info="Definiert die verfügbare Gesamtfitness, die unter den arbeitenden Individuen aufgeteilt wird. Eine höhere Gesamtfitness fördert schnellere Genesung und Reproduktion.">ℹ</button>
           </label>
           <input type="range" id="fitnessPerDay" min="0" max="15" step=".1" value="10">
           <span id="fitnessPerDayValue" class="slider-value">1024</span>
@@ -515,30 +498,31 @@
   
   <div id="graph"></div>
   
-  <!-- Anzeige des Gerätetyps unten links -->
-  <div id="device-indicator"></div>
-  
   <script>
     /* Hardcodierter Zeitschritt */
     const time_step = 0.05;
     
-    /* Funktion, die prüft, ob ein Array ausschließlich Nullen enthält */
+    /* Prüft, ob ein Array ausschließlich Nullen enthält */
     function allZero(arr) {
       return arr.every(val => Math.abs(val) < 1e-12);
     }
     
-    /* Liest den Wert eines Sliders als Float aus */
+    /* Liest den Wert eines Sliders als Float */
     function getSliderFloatValue(id) {
       return parseFloat(document.getElementById(id).value);
     }
     
-    /* Aktualisiert den angezeigten Wert eines Sliders */
+    /* Aktualisiert den angezeigten Wert eines Sliders und schaltet bei Nutzeränderungen zu "Eigene Pandemie" */
     function attachSliderListener(sliderId, displayId, transformFunc) {
       const slider = document.getElementById(sliderId);
       const displayElem = document.getElementById(displayId);
-      slider.oninput = function() {
+      slider.oninput = function(e) {
         let val = parseFloat(this.value);
         displayElem.innerText = transformFunc ? transformFunc(val) : val;
+        // Bei manueller Änderung (user event) wechsle zu "Eigene Pandemie"
+        if(e.isTrusted) {
+          setCustomPresetActive();
+        }
       };
     }
     
@@ -558,7 +542,7 @@
       return parseFloat(val.toPrecision(4));
     }
     
-    /* Erzeugt einen Plotly-Trace und fügt ggf. einen Legendengruppen-Titel hinzu */
+    /* Erzeugt einen Plotly-Trace */
     function makeTrace(xArray, yArray, name, color, dash, group, groupTitle) {
       let trace = {
         x: xArray,
@@ -575,7 +559,7 @@
       return trace;
     }
     
-    /* Startet die Simulation und erstellt den Plot */
+    /* Startet die Simulation */
     function runSimulation() {
       // 1) Populations-Parameter
       let exponent_blobs = getSliderFloatValue("blobsNumber");
@@ -606,7 +590,6 @@
       let exponent_fitness = getSliderFloatValue("fitnessPerDay");
       let fitness_per_day = twoPower(exponent_fitness);
       
-      // Schritte pro Tag
       let steps_per_day = Math.round(1.0 / time_step);
       
       // Abgeleitete Werte
@@ -633,31 +616,25 @@
       let H2 = 0;
       let R2 = 0;
       
-      // Zeitreihen-Arrays
       let S1_list = [S1], I1_list = [I1], H1_list = [H1], A1_list = [A1], R1_list = [R1];
       let S2_list = [S2], I2_list = [I2], H2_list = [H2], A2_list = [A2], R2_list = [R2];
       
-      // Simulation
       for (let day = 0; day < simulation_days; day++) {
         for (let step = 0; step < steps_per_day; step++) {
           let total_population = S1 + I1 + R1 + S2 + I2 + R2 + A1 + A2 + H1 + H2;
           let total_infected = I1 + I2 + H1 + H2 + A1 + A2;
           
-          // Strategie 1 Koeffizienten
           let xi_S1 = Math.max(0, (fitness_per_day - healthy_fitness_loss) / (100.0 * total_population));
           let xi_A1 = Math.max(0, (fitness_per_day - infected_fitness_loss) / (100.0 * total_population));
           let xi_R1 = Math.max(0, (fitness_per_day - healthy_fitness_loss) / (100.0 * total_population));
           
-          // Strategie 2 Koeffizienten
           let xi_S2 = xi_S1 * (1 - total_infected / total_population);
           let xi_A2 = xi_A1 * (1 - total_infected / total_population);
           let xi_R2 = xi_R1 * (1 - total_infected / total_population);
           
-          // Angepasstes beta für Strategie 2
           let beta2 = beta * Math.pow(2, - (total_infected / (total_population * alpha)));
           let combined_H = H1 + H2;
           
-          // Ableitungen Strategie 1
           let dS1 = (epsilon * R1 + xi_S1 * S1 + xi_A1 * A1 + xi_R1 * R1 - beta * (A1 + A2) * S1 - mu_S * S1) * time_step;
           let dI1 = 0, dH1 = 0, dA1 = 0, dR1 = 0;
           if (combined_H <= Healthcare_size) {
@@ -670,7 +647,6 @@
           dA1 = (beta * (1 - severity) * (A1 + A2) * S1 - gamma * A1 - mu_A * A1) * time_step;
           dR1 = (gamma * I1 + gamma * A1 - epsilon * R1 - mu_R * R1) * time_step;
           
-          // Ableitungen Strategie 2
           let dS2 = (epsilon * R2 + xi_S2 * S2 + xi_A2 * A2 + xi_R2 * R2 - beta2 * (A1 + A2) * S2 - mu_S * S2) * time_step;
           let dI2 = 0, dH2 = 0, dA2 = 0, dR2 = 0;
           if (combined_H <= Healthcare_size) {
@@ -683,9 +659,7 @@
           dA2 = (beta2 * (1 - severity) * (A1 + A2) * S2 - gamma * A2 - mu_A * A2) * time_step;
           dR2 = (gamma * I2 + gamma * A2 - epsilon * R2 - mu_R * R2) * time_step;
           
-          // Update Strategie 1
           S1 += dS1; I1 += dI1; H1 += dH1; A1 += dA1; R1 += dR1;
-          // Update Strategie 2
           S2 += dS2; I2 += dI2; H2 += dH2; A2 += dA2; R2 += dR2;
         }
         S1_list.push(S1); I1_list.push(I1); H1_list.push(H1); A1_list.push(A1); R1_list.push(R1);
@@ -697,7 +671,6 @@
       let addedStrategie1Title = false;
       let addedStrategie2Title = false;
       
-      // Traces für Strategie 1 (nur anzeigen, wenn die Daten nicht ausschließlich 0 sind)
       if (!allZero(S1_list)) {
         let groupTitle = !addedStrategie1Title ? "Strategie 1 (konstantes β)" : undefined;
         data.push(makeTrace(days, S1_list, "Infizierbar", 'navy', 'solid', "strategie1", groupTitle));
@@ -708,7 +681,6 @@
       if (!allZero(A1_list)) data.push(makeTrace(days, A1_list, "symptomlos", 'orange', 'solid', "strategie1"));
       if (!allZero(R1_list)) data.push(makeTrace(days, R1_list, "immun", 'purple', 'solid', "strategie1"));
       
-      // Traces für Strategie 2
       if (!allZero(S2_list)) {
         let groupTitle = !addedStrategie2Title ? "Strategie 2 (dynamisches β, Anpassung durch α)" : undefined;
         data.push(makeTrace(days, S2_list, "Infizierbar", 'blue', 'dash', "strategie2", groupTitle));
@@ -719,8 +691,6 @@
       if (!allZero(A2_list)) data.push(makeTrace(days, A2_list, "symptomlos", 'goldenrod', 'dash', "strategie2"));
       if (!allZero(R2_list)) data.push(makeTrace(days, R2_list, "immun", 'indigo', 'dash', "strategie2"));
       
-      // Graph-Layout: Hier passen wir die Schriftgrößen so an, dass der Graph lesbar bleibt.
-      // Auf mobilen Geräten verwenden wir moderate Werte, während auf Desktop standardmäßig kleinere Werte genutzt werden.
       var isMobile = document.documentElement.classList.contains("mobile");
       var graphTitleSize = isMobile ? 48 : 24;
       var graphAxisTitleSize = isMobile ? 36 : 18;
@@ -747,7 +717,98 @@
       Plotly.newPlot('graph', data, layout, config);
     }
     
-    // Slider-Listener aktivieren
+    /* Preset-Funktion */
+    function applyPreset(preset, btn) {
+      document.querySelectorAll('.preset-button').forEach(b => b.classList.add('inactive'));
+      btn.classList.remove('inactive');
+      
+      if (preset === 'custom') {
+        return; // Bei "Eigene Pandemie" keine Änderung der Slider
+      }
+      
+      if (preset === 'grippe') {
+        document.getElementById('infectivity').value = Number(Math.log10(0.007079)).toFixed(2);
+        document.getElementById('severity').value = 0.05;
+        document.getElementById('recoveryChance').value = 0.3;
+        document.getElementById('immunityHalfTime').value = Number(Math.log(13)/Math.log(5)).toFixed(2);
+        
+        document.getElementById('infectivityValue').innerText = parseFloat(Math.pow(10, document.getElementById('infectivity').value).toPrecision(4));
+        document.getElementById('severityValue').innerText = document.getElementById('severity').value;
+        document.getElementById('recoveryChanceValue').innerText = document.getElementById('recoveryChance').value;
+        document.getElementById('immunityHalfTimeValue').innerText = parseFloat(Math.pow(5, document.getElementById('immunityHalfTime').value).toPrecision(4));
+      } else if (preset === 'pest') {
+        document.getElementById('blobsNumber').value = 10; // 2^10 ~ 1024
+        document.getElementById('simulationDays').value = Number(Math.log(30)/Math.log(4)).toFixed(2);
+        document.getElementById('infectivity').value = Number(Math.log10(0.005)).toFixed(2);
+        document.getElementById('severity').value = 0.6;
+        document.getElementById('recoveryChance').value = 0.5;
+        document.getElementById('infectedFromStart').value = 0.01;
+        document.getElementById('immunityHalfTime').value = Number(Math.log(90)/Math.log(5)).toFixed(2);
+        document.getElementById('healthcareSize').value = Number(Math.log2(80)).toFixed(2);
+        document.getElementById('fitnessPerDay').value = Number(Math.log2(3500)).toFixed(2);
+        
+        document.getElementById('blobsNumberValue').innerText = twoPower(parseFloat(document.getElementById('blobsNumber').value));
+        document.getElementById('simulationDaysValue').innerText = fourPower(parseFloat(document.getElementById('simulationDays').value));
+        document.getElementById('infectivityValue').innerText = parseFloat(Math.pow(10, document.getElementById('infectivity').value).toPrecision(4));
+        document.getElementById('severityValue').innerText = document.getElementById('severity').value;
+        document.getElementById('recoveryChanceValue').innerText = document.getElementById('recoveryChance').value;
+        document.getElementById('infectedFromStartValue').innerText = document.getElementById('infectedFromStart').value;
+        document.getElementById('immunityHalfTimeValue').innerText = parseFloat(Math.pow(5, document.getElementById('immunityHalfTime').value).toPrecision(4));
+        document.getElementById('healthcareSizeValue').innerText = twoPower(parseFloat(document.getElementById('healthcareSize').value));
+        document.getElementById('fitnessPerDayValue').innerText = twoPower(parseFloat(document.getElementById('fitnessPerDay').value));
+      } else if (preset === 'hiv') {
+        document.getElementById('simulationDays').value = Number(Math.log(110)/Math.log(4)).toFixed(2);
+        document.getElementById('blobsNumber').value = 10;
+        document.getElementById('infectivity').value = Number(Math.log10(0.0045)).toFixed(2);
+        document.getElementById('severity').value = 0.3;
+        document.getElementById('recoveryChance').value = 0.01;
+        document.getElementById('immunityHalfTime').value = 0;  // 5^0 = 1
+        document.getElementById('infectedFromStart').value = 0.01;
+        document.getElementById('healthcareSize').value = Number(Math.log2(400)).toFixed(2);
+        document.getElementById('infectedFitnessLoss').value = 8;
+        document.getElementById('fitnessPerDay').value = Number(Math.log2(2500)).toFixed(2);
+        
+        document.getElementById('simulationDaysValue').innerText = fourPower(parseFloat(document.getElementById('simulationDays').value));
+        document.getElementById('blobsNumberValue').innerText = twoPower(parseFloat(document.getElementById('blobsNumber').value));
+        document.getElementById('infectivityValue').innerText = parseFloat(Math.pow(10, document.getElementById('infectivity').value).toPrecision(4));
+        document.getElementById('severityValue').innerText = document.getElementById('severity').value;
+        document.getElementById('recoveryChanceValue').innerText = document.getElementById('recoveryChance').value;
+        document.getElementById('immunityHalfTimeValue').innerText = parseFloat(Math.pow(5, document.getElementById('immunityHalfTime').value).toPrecision(4));
+        document.getElementById('infectedFromStartValue').innerText = document.getElementById('infectedFromStart').value;
+        document.getElementById('healthcareSizeValue').innerText = twoPower(parseFloat(document.getElementById('healthcareSize').value));
+        document.getElementById('infectedFitnessLossValue').innerText = document.getElementById('infectedFitnessLoss').value;
+        document.getElementById('fitnessPerDayValue').innerText = twoPower(parseFloat(document.getElementById('fitnessPerDay').value));
+      } else if (preset === 'covid') {
+        // COVID‑19 Preset (ehemals HIV Variante 2)
+        document.getElementById('blobsNumber').value = 10;
+        document.getElementById('simulationDays').value = Number(Math.log(60)/Math.log(4)).toFixed(2);
+        document.getElementById('infectivity').value = Number(Math.log10(0.0025)).toFixed(2);
+        document.getElementById('severity').value = 0.08;
+        document.getElementById('recoveryChance').value = 0.15;
+        document.getElementById('immunityHalfTime').value = 4;  // 5^4 = 625
+        document.getElementById('infectedFromStart').value = 0.01;
+        document.getElementById('fitnessPerDay').value = Number(Math.log2(750)).toFixed(2);
+        
+        document.getElementById('blobsNumberValue').innerText = twoPower(parseFloat(document.getElementById('blobsNumber').value));
+        document.getElementById('simulationDaysValue').innerText = fourPower(parseFloat(document.getElementById('simulationDays').value));
+        document.getElementById('infectivityValue').innerText = parseFloat(Math.pow(10, document.getElementById('infectivity').value).toPrecision(4));
+        document.getElementById('severityValue').innerText = document.getElementById('severity').value;
+        document.getElementById('recoveryChanceValue').innerText = document.getElementById('recoveryChance').value;
+        document.getElementById('immunityHalfTimeValue').innerText = parseFloat(Math.pow(5, document.getElementById('immunityHalfTime').value).toPrecision(4));
+        document.getElementById('infectedFromStartValue').innerText = document.getElementById('infectedFromStart').value;
+        document.getElementById('fitnessPerDayValue').innerText = twoPower(parseFloat(document.getElementById('fitnessPerDay').value));
+      }
+    }
+    
+    /* Schaltet den Preset-Button "Eigene Pandemie" aktiv */
+    function setCustomPresetActive() {
+      document.querySelectorAll('.preset-button').forEach(b => b.classList.add('inactive'));
+      let customBtn = document.getElementById('preset-custom');
+      if (customBtn) {
+        customBtn.classList.remove('inactive');
+      }
+    }
+    
     attachSliderListener("blobsNumber", "blobsNumberValue", twoPower);
     attachSliderListener("simulationDays", "simulationDaysValue", fourPower);
     attachSliderListener("infectivity", "infectivityValue", val => parseFloat(Math.pow(10, val).toPrecision(4)));
@@ -760,7 +821,6 @@
       attachSliderListener(id, id + "Value");
     });
     
-    /* Collapsible Sections: Der gesamte Header (h3) ist klickbar – mit animierter Auf-/Zuklapp-Funktion */
     document.querySelectorAll('.category-section h3').forEach(h3 => {
       h3.addEventListener('click', function() {
         let content = this.nextElementSibling;
@@ -774,7 +834,6 @@
       });
     });
     
-    /* Tooltip-Management per JavaScript mit Fade-Animation */
     let currentTooltip = null;
     let tooltipHideTimeout = null;
     
@@ -790,7 +849,6 @@
       tooltip.innerHTML = tooltipText;
       document.body.appendChild(tooltip);
       
-      // Positioniere den Tooltip unterhalb des Buttons (mittig ausgerichtet)
       const btnRect = btn.getBoundingClientRect();
       tooltip.style.left = '0px';
       tooltip.style.top = '0px';
@@ -804,12 +862,10 @@
       tooltip.style.left = left + 'px';
       tooltip.style.top = top + 'px';
       
-      // Kurze Fade-Animation
       requestAnimationFrame(() => {
         tooltip.style.opacity = '1';
       });
       
-      // Tooltip bleibt sichtbar, wenn Maus darüber fährt
       tooltip.addEventListener('mouseenter', function() {
         if (tooltipHideTimeout) {
           clearTimeout(tooltipHideTimeout);
@@ -842,7 +898,6 @@
       });
     });
     
-    /* Anzeige des Gerätetyps unten links */
     document.addEventListener("DOMContentLoaded", function() {
       const indicator = document.getElementById("device-indicator");
       indicator.textContent = window.deviceType ? window.deviceType : "Unbekannt";
